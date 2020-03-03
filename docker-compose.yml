@@ -1,0 +1,52 @@
+version: "3"
+
+services: 
+    web:
+        # build: .
+        # container_name: application
+        image: app:v2
+        ports: 
+            - "8000:8000"
+        environment:
+            - MYSQL_HOST=db
+            - MYSQL_PASSWORD=
+            - MYSQL_USER=root
+            - MYSQL_DATABASE=web_chat
+            - MYSQL_PORT=3306
+            - REDIS_PORT=6379
+            - REDIS_HOST=redis
+            # - REDIS_HOST=192.168.1.103
+            - PORT=8000 
+        volumes:
+            - .:/usr/src/app
+        depends_on:
+            - db
+        restart: on-failure
+        
+    db:
+        # build:
+        #     context: .
+        #     dockerfile: Dockerfile_DB
+        image: mysql:5.7
+        container_name: storage
+        environment: 
+            - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+            - MYSQL_PASSWORD=
+            - MYSQL_USER=root
+            - MYSQL_DATABASE=web_chat
+            - DATABASE_HOST=db
+        expose: 
+            - 3306
+        ports: 
+            - "3306:3306"
+        volumes:
+            - ./dbdata:/docker-entrypoint-initdb.d
+
+    redis:
+        image: redis
+        container_name: cache
+        expose: 
+            - 6369
+        ports: 
+            - "6379:6379"
+
